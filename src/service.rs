@@ -389,20 +389,6 @@ impl MovieBoxService {
     }
 }
 
-pub async fn decode_poster(bytes: Vec<u8>) -> Option<Arc<image::DynamicImage>> {
-    tokio::task::spawn_blocking(move || {
-        let img = image::load_from_memory(&bytes).ok()?;
-        const MAX_DIM: u32 = 512;
-        let downscaled = if img.width().max(img.height()) <= MAX_DIM {
-            img
-        } else {
-            img.resize(MAX_DIM, MAX_DIM, image::imageops::FilterType::Triangle)
-        };
-        Some(Arc::new(downscaled))
-    })
-    .await
-    .ok()?
-}
 
 pub fn metric_value(item: &serde_json::Value, keys: &[&str]) -> Option<f64> {
     let mut containers = vec![item];
@@ -536,19 +522,6 @@ pub fn find_matching_resource_item(
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn test_decode_poster_caps_dimensions() {
-        let mut buffer = std::io::Cursor::new(Vec::new());
-        let img = image::DynamicImage::new_rgb8(800, 600);
-        img.write_to(&mut buffer, image::ImageFormat::Png).unwrap();
-        let bytes = buffer.into_inner();
-
-        let decoded = decode_poster(bytes).await.unwrap();
-        assert!(decoded.width() <= 512);
-        assert!(decoded.height() <= 512);
-        assert_eq!(decoded.width(), 512);
-        assert_eq!(decoded.height(), 384);
-    }
 
     #[test]
     fn test_find_matching_resource_item_integer_and_string_values() {
