@@ -18,11 +18,10 @@ const formatBytes = (bytes?: number): string => {
 };
 
 const getApiBase = () => {
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname || '127.0.0.1';
-    return `${window.location.protocol}//${host}:8000`;
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://127.0.0.1:8000';
   }
-  return 'http://127.0.0.1:8000';
+  return 'https://cinema-web-q3y3.onrender.com';
 };
 
 const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, onClose, movieId, provider }) => {

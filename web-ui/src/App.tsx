@@ -24,6 +24,13 @@ interface Movie {
 
 const PAGE_SIZE = 18;
 
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://127.0.0.1:8000';
+  }
+  return 'https://cinema-web-q3y3.onrender.com';
+};
+
 const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'home' | 'movies' | 'tv'>('home');
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
@@ -66,7 +73,7 @@ const App: React.FC = () => {
     }
     setIsLoading(true);
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`${getApiBase()}/api/search?q=${encodeURIComponent(query)}`);
         if (res.ok) {
             const data = await res.json();
             const items: CatalogItem[] = data.items || [];
@@ -99,8 +106,8 @@ const App: React.FC = () => {
       setIsLoading(true);
       try {
         const [moviesRes, showsRes] = await Promise.all([
-          fetch(`http://127.0.0.1:8000/api/homepage?tab=1&page=1`),
-          fetch(`http://127.0.0.1:8000/api/homepage?tab=2&page=1`)
+          fetch(`${getApiBase()}/api/homepage?tab=1&page=1`),
+          fetch(`${getApiBase()}/api/homepage?tab=2&page=1`)
         ]);
         
         if (moviesRes.ok) {
@@ -141,7 +148,7 @@ const App: React.FC = () => {
     if (newPage < 1) return;
     setIsPaginating(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/homepage?tab=1&page=${newPage}`);
+      const res = await fetch(`${getApiBase()}/api/homepage?tab=1&page=${newPage}`);
       if (res.ok) {
         const data = await res.json();
         const items: CatalogItem[] = data.items || [];
@@ -168,7 +175,7 @@ const App: React.FC = () => {
     if (newPage < 1) return;
     setIsPaginating(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/homepage?tab=2&page=${newPage}`);
+      const res = await fetch(`${getApiBase()}/api/homepage?tab=2&page=${newPage}`);
       if (res.ok) {
         const data = await res.json();
         const items: CatalogItem[] = data.items || [];
