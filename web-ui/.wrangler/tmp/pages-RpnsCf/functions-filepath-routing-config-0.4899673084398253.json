@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/hello",
+      "mountPath": "/api",
+      "method": "",
+      "module": [
+        "api/hello.ts:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}
