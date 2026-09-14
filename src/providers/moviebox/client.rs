@@ -136,6 +136,11 @@ impl MovieBoxClient {
     }
 
     async fn fetch_fresh_session(&self) -> Result<MovieBoxSession, ScraperError> {
+        if let Ok(env_token) = std::env::var("MOVIEBOX_TOKEN") {
+            let uid = std::env::var("MOVIEBOX_UID").ok();
+            return Ok(MovieBoxSession::from_token_and_payload(env_token, uid));
+        }
+
         let path = "/wefeed-mobile-bff/user-api/visitor-login";
         let body_str = "{}";
         let val = self
