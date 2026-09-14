@@ -21,6 +21,7 @@ pub fn init() {
                         .directory(&log_dir)
                         .basename(crate::config::APP_NAME),
                 )
+                .duplicate_to_stderr(flexi_logger::Duplicate::All)
                 .rotate(
                     Criterion::Size(5 * 1024 * 1024),
                     Naming::Numbers,
