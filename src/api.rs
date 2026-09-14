@@ -530,11 +530,11 @@ pub async fn start_server(port: u16) -> Result<(), std::io::Error> {
         .with_state(state)
         .layer(cors);
 
-    let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", port))
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
         .unwrap();
 
-    println!("MovieBox API Server running at http://127.0.0.1:{}", port);
+    println!("MovieBox API Server running at http://0.0.0.0:{}", port);
     
     axum::serve(listener, app)
         .await

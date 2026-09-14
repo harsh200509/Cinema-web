@@ -81,7 +81,10 @@ async fn main() -> std::io::Result<()> {
     cinema::logging::init();
 
     // The backend now defaults to starting the API server immediately.
-    let mut port = 8000;
+    let mut port = std::env::var("PORT")
+        .unwrap_or_else(|_| "8000".to_string())
+        .parse::<u16>()
+        .unwrap_or(8000);
     
     // Check if user passed -p or --port
     if let Some(pos) = args.iter().position(|arg| arg == "-p" || arg == "--port") {
