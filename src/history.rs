@@ -22,6 +22,46 @@ pub struct WatchHistoryItem {
     pub completed: bool,
 }
 
+pub fn parse_duration_seconds(s: &str) -> Option<u64> {
+    let mut total_secs = 0;
+    let s = s.to_lowercase().replace("min", "m").replace("sec", "s").replace("hr", "h");
+    
+    // Simple parser for "1h 30m" or "90m" etc.
+    let mut current_num = String::new();
+    for c in s.chars() {
+        if c.is_ascii_digit() {
+            current_num.push(c);
+        } else if let Ok(n) = current_num.parse::<u64>() {
+            match c {
+                'h' => total_secs += n * 3600,
+                'm' => total_secs += n * 60,
+                's' => total_secs += n,
+                _ => {}
+            }
+            current_num.clear();
+        }
+    }
+    if total_secs == 0 {
+        if let Ok(n) = current_num.parse::<u64>() {
+            // Assume minutes if just a number
+            return Some(n * 60);
+        }
+    }
+    
+    if total_secs > 0 { Some(total_secs) } else { None }
+}
+
+pub fn format_duration(secs: u64) -> String {
+    let h = secs / 3600;
+    let m = (secs % 3600) / 60;
+    let s = secs % 60;
+    if h > 0 {
+        format!("{:02}:{:02}:{:02}", h, m, s)
+    } else {
+        format!("{:02}:{:02}", m, s)
+    }
+}
+
 impl WatchHistoryItem {
     pub fn from_details(
         provider: &str,
@@ -41,7 +81,7 @@ impl WatchHistoryItem {
         let duration_seconds = details
             .duration
             .as_deref()
-            .and_then(crate::tui::text::parse_duration_seconds);
+            .and_then(parse_duration_seconds);
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
@@ -110,10 +150,10 @@ impl WatchHistoryItem {
     }
 
     pub fn formatted_progress(&self) -> String {
-        let pos = crate::tui::text::format_duration(self.progress_seconds);
+        let pos = format_duration(self.progress_seconds);
         if let Some(dur) = self.duration_seconds {
             if dur > 0 {
-                return format!("{} / {}", pos, crate::tui::text::format_duration(dur));
+                return format!("{} / {}", pos, format_duration(dur));
             }
         }
         pos
