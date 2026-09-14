@@ -67,6 +67,7 @@ impl Resolve for FallbackResolver {
 
 pub fn http_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
+        .http1_only()
         .dns_resolver(Arc::new(FallbackResolver::new()))
         .tcp_nodelay(true)
         .tcp_keepalive(Some(std::time::Duration::from_secs(45)))
